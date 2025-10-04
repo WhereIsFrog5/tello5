@@ -33,7 +33,7 @@ void receiveresponse() {
     while(true) {
         int len = Tello::receiveResponse(outBuf, sizeof(outBuf));
         if (len > 0) {
-            std::cout << "[ TELLO RESPONSE ]: " << outBuf << std::endl;
+            std::cout << "[ TELLO RESPONSE ]: " << outBuf;
         }
     }
 }

@@ -33,6 +33,38 @@ void receiveresponse() {
     while(true) {
         int len = Tello::receiveResponse(outBuf, sizeof(outBuf));
         if (len > 0) {
+            if(len < sizeof(outBuf)-1) {
+                /*
+                something weird that tello does is that on responses like error or ok it does not
+                add a newline while on responses on commands like baro? attitude? speed? battery?
+                it adds a newline, so here we basically are checking if it added a newline
+                if it did add a newline we just print it, if not we add a newline and also print
+                for example, if we just do
+                std::cout << "[ TELLO RESPONSE ]: " << outBuf << std::endl;
+                without this if then it will look something like this:
+                command
+                [ TELLO RESPONSE ]: ok
+                takeoff
+                [ TELLO RESPONSE ]: ok
+                land
+                [ TELLO RESPONSE ]: ok
+                battery?
+                [ TELLO RESPONSE ]: 42
+
+                attitude?
+                [ TELLO RESPONSE ]: pitch:2;roll:0;yaw:76;
+
+                baro?
+                [ TELLO RESPONSE ]: 77.771301
+
+                see those newlines anyways enough yapping
+                */
+                if(outBuf[len-1] != '\n'){
+                    outBuf[len] = '\n';
+                    outBuf[len+1] = '\0';
+                }
+                
+            }
             std::cout << "[ TELLO RESPONSE ]: " << outBuf;
         }
     }
@@ -69,14 +101,14 @@ int main() {
 
     // note that you will need to send "command" to be able to use sdk commands
     // it will look something like this
-    // Tello::sendCustomMessage("command");
+    Tello::sendCustomMessage("command");
   
     while(true) {
         char outBuf[1024] = {0};
         while(true) {
             int len = Tello::receiveState(outBuf, sizeof(outBuf));
             if (len > 0) {
-                std::cout << "[ TELLO STATE ]: " << outBuf;
+                std::cout << "[ TELLO STATE ]: " << outBuf; // tello adds a newline on state
             }
         }
     }
